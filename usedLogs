@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sudo mv /iit-project/logs/cpu/*.json /iit-project/logs/cpu/used/
+sudo mv /iit-project/logs/network/inb/*.json /iit-project/logs/network/inb/used/
+sudo mv /iit-project/logs/network/outb/*.json /iit-project/logs/network/outb/used/
+
+
+exit

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# copy data from server
+# scp -r iit-user@ec2-34-202-162-238.compute-1.amazonaws.com:/iit-project/logs/cpu/ ./logs/cpu/
+# scp -r iit-user@ec2-34-202-162-238.compute-1.amazonaws.com:/iit-project/logs/network/inb/ ./logs/network/inb/
+# scp -r iit-user@ec2-34-202-162-238.compute-1.amazonaws.com:/iit-project/logs/network/outb/ ./logs/netwo
+
+scp -r iit-user@ec2-34-202-162-238.compute-1.amazonaws.com:/iit-project/logs/ ~/Documents/Practicum/ 
+
+# Run python script
+python ~/Documents/Practicum/Create_logData.py
+
+# Move used logs in ec2 instance to used
+# ssh into it?
+ssh -i ~/Desktop/manoo-keypair.pem ec2-user@ec2-34-202-162-238.compute-1.amazonaws.com
+cd ..
+cd ..
+cd iit-project/logs/
+
+# move logs
+sudo mv ./cpu/*.json ./cpu/used/
+sudo mv ./network/inb/*.json ./network/inb/used/
+sudo mv ./network/outb/*.json ./network/outb/used/
+
+exit 0

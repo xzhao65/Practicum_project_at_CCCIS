@@ -1,0 +1,103 @@
+---
+title: "Practicum"
+output: html_notebook
+author: "Raquel Buezo"
+---
+## Install packages
+```{r}
+install.packages('data.table')
+install.packages('lubridate')
+install.packages('corrplot')
+```
+
+## Load libraries
+```{r}
+library(data.table)
+library(lubridate)
+library(ggplot2)
+library(corrplot)
+library(anytime)
+```
+
+## Load historic logs and make first predictions
+```{r}
+setwd('~/Documents/Practicum/')
+
+logs <- fread(file = './dataframes/historicLogData.csv', sep = ',', stringsAsFactors = TRUE, header = TRUE)
+
+head(logs)
+```
+
+## Initial statistics
+```{r}
+summary(logs)
+```
+
+```{r}
+str(logs)
+```
+
+## I see there are NAs so I clean the data
+```{r}
+# NAs in my data?
+print("Data before cleaning:")
+apply(logs, 2, function (x) sum(is.na(x)))
+
+# Clean it
+print("Data after cleaning:")
+logs_cln <- na.omit(logs)
+apply(logs_cln, 2, function (x) sum(is.na(x)))
+```
+## I see there are many values equal to -1 so I am going to look at them and remove them
+```{r}
+sum(logs_cln$usage_cpu==-1)
+sum(logs_cln$usage_nwin==-1)
+sum(logs_cln$usage_nwout==-1)
+
+badData <- logs_cln[logs_cln$usage_cpu==-1,]
+summary(badData)
+```
+
+```{r}
+t1 <- anytime(range(badData$timestamp)[1])
+t2 <- anytime(range(badData$timestamp)[2])
+paste("Bad data from " , t1 , " to ", t2)
+```
+
+## See the distribution of the bad data
+```{r}
+ggplot(data = badData, aes(badData$timestamp))+
+  geom_histogram(aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="blue", high="red")+ 
+  labs(title="", x="date", y="Count of -1s")+
+  facet_wrap(~badData$instance, strip.position = 'bottom', dir = 'v')
+```
+
+
+```{r}
+logs_cln[logs_cln$usage_cpu==-1,] <- NA
+apply(logs_cln, 2, function (x) sum(is.na(x)))
+logs_cln <- na.omit(logs_cln)
+apply(logs_cln, 2, function (x) sum(is.na(x)))
+```
+## Look at correlations 
+```{r}
+X3 <- logs_cln[,c('timestamp','usage_cpu','usage_nwin', 'usage_nwout')]
+corr <- round(cor(X3),2)
+corrplot(corr, type = "lower", method = "color", addCoef.col = "black")
+```
+
+
+## Simple regression model only with time & usage_cpu
+```{r}
+X <- logs_cln[, c('instance', 'timestamp','usage_cpu')]
+test <- lm(usage_cpu~., X)
+summary(test)
+```
+
+## Simple regression model adding usage_nwin, usage_nwout
+```{r}
+X2 <- logs_cln[, c('instance', 'timestamp','usage_cpu','usage_nwin', 'usage_nwout')]
+test2 <- lm(usage_cpu~., X2)
+summary(test2)
+```

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ssh -i ~/Desktop/manoo-keypair.pem ec2-user@ec2-34-202-162-238.compute-1.amazonaws.com "bash /iit-project/usedLogs"
+
+exit 0

@@ -1,0 +1,44 @@
+---
+title: "Practicum: Predict average cpu usage"
+output: html_notebook
+author: "Raquel Buezo"
+---
+
+## Install packages
+```{r}
+install.packages('data.table')
+install.packages('lubridate')
+install.packages('corrplot')
+```
+
+## Load libraries
+```{r}
+library(data.table)
+library(lubridate)
+library(ggplot2)
+library(corrplot)
+library(anytime)
+```
+
+## Load historic logs and make first predictions
+```{r}
+setwd('~/Documents/Practicum/')
+
+myData <- fread(file = './dataframes/allData.csv', sep = ',', stringsAsFactors = TRUE, header = TRUE)
+
+head(myData)
+```
+## Initial statistics
+```{r}
+summary(myData)
+```
+
+```{r}
+str(myData)
+```
+## Extract admin server or not variable
+```{r}
+# 'adm'%in%(myData$instance)
+sapply(myData$instance, function (x) 'adm'%in%x)
+```
+
